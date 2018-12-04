@@ -12,6 +12,7 @@ entity game is
 		h_pixels			: integer := 800;
 		v_pixels			: integer := 600;
 		max_score		: integer := 9;
+		clk_period		: integer := 20	--ns
 				);									--Note that the last lines^^vv MUST omit the semicolon
 	port (
 		ball_xpos	:	out	integer;
@@ -23,28 +24,41 @@ END game;
 architecture behavior of game is
 --signals
 
-	--Coordingates of the top-left coordinate (read, smallest) of the square ball, and its direction.
+	--Coordingates of the top-left coordinate (read, smallest) of the square ball.
 	signal ballx : integer := h_pixels/2;
 	signal bally : integer := v_pixels/2;
-	signal movex : std_logic := '0';
-	signal movey : std_logic := '0';
 	
 	--Current vertical coordinates of the tops of the left and right paddles.
 	signal paddle_L : integer := (v_pixels + paddle_height)/2;
 	signal paddle_R : integer := (v_pixels + paddle_height)/2;
 	
-	--Player scores
+	--Counters
 	signal score1	: integer :=0;
 	signal score2	: integer :=0;
+	
+	signal delay	: integer :=0;
 	
 	--Game state machine
 	signal reset		: std_logic :='1';
 	signal ball_reset : std_logic :='1';
---constants
-	--signal paddleSize : integer := 120;
+	signal moveX		: std_logic :='0';
+	signal moveY		: std_logic :='0';
+	signal tick			: std_logic :='1';
+	
 
 BEGIN
 
+	tickRate:process(clk)
+	BEGIN
+		if(clk'event AND clk = '1') then
+			if(delay = clk_period*1000*1000) then
+				delay <= 0;
+				tick	<= NOT tick;
+			else
+				delay <= delay + 1;
+			END if;
+		END if;
+	END; --tickRate
 
 	mechanics:process(ballx, bally, movex, movey, reset, ball_reset, tick)
 	BEGIN
