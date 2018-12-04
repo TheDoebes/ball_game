@@ -15,7 +15,8 @@ entity game is
 				);									--Note that the last lines^^vv MUST omit the semicolon
 	port (
 		ball_xpos	:	out	integer;
-		ball_ypos	:	out	integer
+		ball_ypos	:	out	integer;
+		clk			:	in		std_logic
 			);
 END game;
 
@@ -45,7 +46,7 @@ architecture behavior of game is
 BEGIN
 
 
-	mechanics:process(ballx, bally, movex, movey, reset, ball_reset)
+	mechanics:process(ballx, bally, movex, movey, reset, ball_reset, tick)
 	BEGIN
 	
 	--Score Logic
@@ -104,8 +105,18 @@ BEGIN
 		END if; 
 		
 	--Movement logic
-		
-		
+		if(tick'event AND tick = '1') then
+			if(moveX = '1') then
+				ballx <= ballx + 1;
+			else
+				ballx <= ballx - 1;
+			END if;
+			if(moveY = '1') then
+				bally <= bally + 1;
+			else
+				bally <= bally - 1;
+			END if;
+		END if;
 		
 	END; --mechanics
 		
