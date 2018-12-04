@@ -12,7 +12,7 @@ entity game is
 				);									--Note that the last lines^^vv MUST omit the semicolon
 	port (
 		ball_xpos	:	out	integer;
-		ball_ypos	:	out	integer;
+		ball_ypos	:	out	integer
 			);
 END game;
 
@@ -76,6 +76,11 @@ BEGIN
 			ball_reset = '1';
 		else 
 		--ball is in play
+		END if;
+		if(bally = ball_size) then
+		--reverse y component, to bounce off
+		elsif(bally = v_pixels) then
+		
 		END if;
 		
 		--check for win conditions
