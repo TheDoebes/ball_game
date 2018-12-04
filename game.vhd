@@ -40,32 +40,10 @@ architecture behavior of game is
 
 BEGIN
 
---reset logic, trigger on game start and at the end of win seqeunce.
-	reset_logic:process(reset, ball_reset)
-	BEGIN
-		if(reset = '1') then
-		--reset the game state
-			ball_reset = '1';
-			score1 = 0;
-			score2 = 0;
-			paddlel = (v_pixels + paddle_height)/2;
-			paddler = (v_pixels + paddle_height)/2;
-			reset = '0';
-		End if;
-		if(ball_reset = '1') then
-		--the ball has scored, and should be moved to the starting location
-			ballx <= h_pixels/2;
-			bally <= v_pixels/2;
-			ball_reset <= '0';
-		END if;
-	END; --reset_logic
-	
-	
 
---scoring logic
-
-	score:process(ballx, bally)
+	mechanics:process(ballx, bally, reset, ball_reset)
 	BEGIN
+	--Score Logic
 		if(ballx = 0) then 
 		--player 2 scores
 			score2 = score2 + 1;
@@ -83,8 +61,26 @@ BEGIN
 		
 		END if;
 		
-		--check for win conditions
-	END; --score
+	--check for win conditions
+		
+		
+	--reset logic, trigger on game start and at the end of win seqeunce.
+		if(reset = '1') then
+		--reset the game state
+			ball_reset = '1';
+			score1 = 0;
+			score2 = 0;
+			paddlel = (v_pixels + paddle_height)/2;
+			paddler = (v_pixels + paddle_height)/2;
+			reset = '0';
+		End if;
+		if(ball_reset = '1') then
+		--the ball has scored, and should be moved to the starting location
+			ballx <= h_pixels/2;
+			bally <= v_pixels/2;
+			ball_reset <= '0';
+		END if;
+	END; --mechanics
 		
 		
 		
