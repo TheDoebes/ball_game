@@ -1,7 +1,9 @@
 
 
 entity game is
-	generic (
+--a generic is a sepcial constant. Think of it as a parameter that is only optionally specified. 
+	generic ( 
+	--below is the syntax for generics with default values, used when unspecified
 		paddle_width	: integer := 10;
 		paddle_height	: integer := 120;
 		ball_size		: integer := 20;
@@ -18,12 +20,12 @@ architecture behavior of game is
 --signals
 
 	--Coordingates of the top-left coordinate (read, smallest) of the square ball.
-	signal ballx : integer := 0;
-	signal bally : integer := 0;
+	signal ballx : integer := h_pixels/2;
+	signal bally : integer := v_pixels/2;
 	
 	--Current vertical coordinates of the tops of the left and right paddles.
-	signal paddlel : integer := 0;
-	signal paddler : integer := 0;
+	signal paddlel : integer := (v_pixels + paddle_height)/2;
+	signal paddler : integer := (v_pixels + paddle_height)/2;
 	
 	
 	--Player scores
@@ -41,6 +43,21 @@ BEGIN
 --reset logic, trigger on game start and at the end of win seqeunce.
 	reset_logic:process(reset, ball_reset)
 	BEGIN
+		if(reset = '1') then
+		--reset the game state
+			ball_reset = '1';
+			score1 = 0;
+			score2 = 0;
+			paddlel = (v_pixels + paddle_height)/2;
+			paddler = (v_pixels + paddle_height)/2;
+			reset = '0';
+		End if;
+		if(ball_reset = '1') then
+		--the ball has scored, and should be moved to the starting location
+			ballx <= h_pixels/2;
+			bally <= v_pixels/2;
+			ball_reset <= '0';
+		END if;
 	END; --reset_logic
 	
 	
