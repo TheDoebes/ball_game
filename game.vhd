@@ -58,7 +58,7 @@ BEGIN
 	tickRate:process(clk)
 	BEGIN
 		if(clk'event AND clk = '1') then
-			if(delay = clk_period*1000*1000) then
+			if(delay = clk_period*10*1000) then
 				delay <= 0;
 				tick	<= NOT tick;
 			else
@@ -105,6 +105,18 @@ BEGIN
 			ballx <= h_pixels/2;
 			bally <= v_pixels/2;
 			ball_reset <= '0';
+	--Movement Logic
+		elsif(tick'event AND tick = '1') then
+			if(moveX = '1') then
+				ballx <= ballx + 1;
+			else
+				ballx <= ballx - 1;
+			END if;
+			if(moveY = '1') then
+				bally <= bally + 1;
+			else
+				bally <= bally - 1;
+			END if;
 		END if;
 		
 	--Collision logic
@@ -124,21 +136,7 @@ BEGIN
 		--move against y axis
 			movey <= '0';
 		END if; 
-		
-	--Movement logic
-		if(tick'event AND tick = '1') then
-			if(moveX = '1') then
-				ballx <= ballx + 1;
-			else
-				ballx <= ballx - 1;
-			END if;
-			if(moveY = '1') then
-				bally <= bally + 1;
-			else
-				bally <= bally - 1;
-			END if;
-		END if;
-		
+				
 	END process; --mechanics
 		
 END architecture;

@@ -46,6 +46,8 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	constant paddle_width	: integer := 10;
 	constant	paddle_height	: integer := 120;
 	constant	ball_size		: integer := 20;
+	constant h_pixels			: integer := 800;
+	constant v_pixels			: integer := 600;
 
 	signal ballx : integer;
 	signal bally : integer;
