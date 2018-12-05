@@ -15,9 +15,11 @@ entity game is
 		clk_period		: integer := 20	--ns
 				);									--Note that the last lines^^vv MUST omit the semicolon
 	port (
-		ball_xpos	:	out	integer;
-		ball_ypos	:	out	integer;
-		clk			:	in		std_logic
+		ball_xpos	: out	integer;
+		ball_ypos	: out	integer;
+		paddle_Lpos	: out	integer;
+		paddle_Rpos	: out integer;
+		clk			: in	std_logic
 			);
 END game;
 
@@ -48,6 +50,11 @@ architecture behavior of game is
 
 BEGIN
 
+	ball_xpos <= ballx;
+	ball_ypos <= bally;
+	paddle_Lpos <= paddle_L;
+	paddle_Rpos <= paddle_R;
+
 	tickRate:process(clk)
 	BEGIN
 		if(clk'event AND clk = '1') then
@@ -58,7 +65,7 @@ BEGIN
 				delay <= delay + 1;
 			END if;
 		END if;
-	END; --tickRate
+	END process; --tickRate
 
 	mechanics:process(ballx, bally, movex, movey, reset, ball_reset, tick)
 	BEGIN
@@ -132,8 +139,6 @@ BEGIN
 			END if;
 		END if;
 		
-	END; --mechanics
+	END process; --mechanics
 		
-		
-		
-			
+END architecture;

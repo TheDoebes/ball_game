@@ -2,7 +2,8 @@
 --
 --   FileName:         hw_image_generator.vhd
 --   Dependencies:     none
---   Design Software:  Quartus II 64-bit Version 12.1 Build 177 SJ Full Version
+--   Design Software:  Quartus Prime 16.1 lite
+--			Previously:	Quartus II 64-bit Version 12.1 Build 177 SJ Full Version
 --
 --   HDL CODE IS PROVIDED "AS IS."  DIGI-KEY EXPRESSLY DISCLAIMS ANY
 --   WARRANTY OF ANY KIND, WHETHER EXPRESS OR IMPLIED, INCLUDING BUT NOT
@@ -17,7 +18,9 @@
 --   Version History
 --   Version 1.0 05/10/2013 Scott Larson
 --     Initial Public Release
---    
+--	  Later Versions: 12/18 Cade Doebele
+--    Component of ball_game, and modifications from the original 
+--		are covered under MIT License .
 --------------------------------------------------------------------------------
 
 LIBRARY ieee;
@@ -40,38 +43,70 @@ END hw_image_generator;
 
 ARCHITECTURE behavior OF hw_image_generator IS
 
-signal loc : integer := 0;
-signal delay : integer := 0;
+	constant paddle_width	: integer := 10;
+	constant	paddle_height	: integer := 120;
+	constant	ball_size		: integer := 20;
+
+	signal ballx : integer;
+	signal bally : integer;
+	signal paddle_L : integer;
+	signal paddle_R : integer;
+	
+	signal score1 : integer;
+	signal score2 : integer;
+	
+	component game
+		port (
+			ball_xpos	: out	integer;
+			ball_ypos	: out	integer;
+			paddle_Lpos	: out	integer;
+			paddle_Rpos	: out integer;
+			clk			: in	std_logic
+				);
+	end component;
 
 BEGIN
+
+	main : game --instatiate the game component.
+		port map (ballX,ballY,paddle_L,paddle_R,clk);
+	
+	
 	PROCESS(disp_ena, row, column, clk)
 	BEGIN
 		IF(disp_ena = '1') THEN		--display time
-			IF(row < pixels_y AND column < pixels_x) THEN --blue square
-				red <= (OTHERS => '0');
+		
+	--render the game elements
+	
+		--render the purple ball
+			if(ballx < row AND row < ballx + ball_size AND 
+				bally < column AND column < bally + ball_size)
+			then 
+				red <= (others => '1');
 				green	<= (OTHERS => '0');
 				blue <= (OTHERS => '1');
-			ELSIF(row < pixels_y XOR column < pixels_x) THEN --teal boxes
+		--render the left blue paddle
+			elsif(row < paddle_width AND 
+					paddle_L < column AND column < paddle_L + paddle_height)
+			then 
+				red <= (others => '0');
+				green	<= (OTHERS => '0');
+				blue <= (OTHERS => '1');
+		--render the right red paddle
+			elsif(h_pixels - paddle_width < row AND
+					paddle_R < column AND column < paddle_R + paddle_height)
+			then
+				red <= (others => '1');
+				green	<= (OTHERS => '0');
+				blue <= (OTHERS => '0');
+		
+		--render the teal background
+			ELSE 
 				red <= (OTHERS => '0');
 				green	<= (OTHERS => '1');
 				blue <= (OTHERS => '1');
-			ELSIF(row > pixels_y AND row < 120 AND column < 120 AND column > pixels_x) THEN --red bars
-				IF(row < loc and column < loc) THEN	--purple space
-					red <= (OTHERS => '1');
-					green	<= (OTHERS => '0');
-					blue <= (OTHERS => '1');
-				ELSE
-					red <= (OTHERS => '1');
-					green	<= (OTHERS => '0');
-					blue <= (OTHERS => '0');
-				END IF;
-			--END IF; -- error location
-			ELSE 									--yellow space
-				red <= (OTHERS => '1');
-				green	<= (OTHERS => '1');
-				blue <= (OTHERS => '0');
 			END IF;
-		--END IF;
+			
+			
 		ELSE								--blanking time
 			red <= (OTHERS => '0');
 			green <= (OTHERS => '0');
@@ -80,25 +115,5 @@ BEGIN
 	
 	END PROCESS;
 	
-	
-	PROCESS(clk)
-	BEGIN
-		IF (clk'EVENT AND clk = '1')	THEN
-			IF(delay = 0) THEN 			--Delay will equal zero at 5Hz.
-				IF(loc > 120) THEN
-					loc <= 20;
-					delay <= 0;
-				ELSE
-					loc <= loc + 1;
-				END IF;
-			END IF;
-			
-			IF(delay < 5000000) THEN
-				delay <= delay + 1;
-			ELSE
-				DELAY <= 0;	
-			END IF;
-		END IF;
-	END PROCESS;
 	
 END behavior;
