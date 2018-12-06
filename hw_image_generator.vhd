@@ -36,9 +36,18 @@ ENTITY hw_image_generator IS
 		disp_ena		:	IN		STD_LOGIC;	--display enable ('1' = display time, '0' = blanking time)
 		row			:	IN		INTEGER;		--row pixel coordinate
 		column		:	IN		INTEGER;		--column pixel coordinate
+		button0		:	IN		STD_LOGIC;
+		button1		:	IN		STD_LOGIC;
+		button2		:	IN		STD_LOGIC;
+		button3		:	IN		STD_LOGIC;
+
 		red			:	OUT	STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --red magnitude output to DAC
 		green			:	OUT	STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');  --green magnitude output to DAC
-		blue			:	OUT	STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0')); --blue magnitude output to DAC
+		blue			:	OUT	STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0'); --blue magnitude output to DAC
+		seg1			:	out	std_logic_vector(6 downto 0) := (others => '1');
+		seg2			:	out	std_logic_vector(6 downto 0) := (others => '1')
+		);
+		
 END hw_image_generator;
 
 ARCHITECTURE behavior OF hw_image_generator IS
@@ -48,32 +57,227 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	constant	ball_size		: integer := 20;
 	constant h_pixels			: integer := 800;
 	constant v_pixels			: integer := 600;
+	constant max_score		: integer := 9;
+	constant clk_period		: integer := 20;
 
-	signal ballx : integer;
-	signal bally : integer;
-	signal paddle_L : integer;
-	signal paddle_R : integer;
+	--Coordingates of the top-left coordinate (read, smallest) of the square ball.
+	signal ballx : integer := h_pixels/2;
+	signal bally : integer := v_pixels/2;
 	
-	signal score1 : integer;
-	signal score2 : integer;
+	--Current vertical coordinates of the tops of the left and right paddles.
+	signal paddle_L : integer := v_pixels/2 - paddle_height/2;
+	signal paddle_R : integer := v_pixels/2 - paddle_height/2;
 	
-	component game
-		port (
-			ball_xpos	: out	integer;
-			ball_ypos	: out	integer;
-			paddle_Lpos	: out	integer;
-			paddle_Rpos	: out integer;
-			clk			: in	std_logic
-				);
-	end component;
+	--Counters
+	signal score1	: integer :=0;
+	signal score2	: integer :=0;
+	
+	signal delay	: integer :=0;
+	
+	--Game state machine
+	signal reset		: std_logic :='1';
+	signal ball_reset : std_logic :='1';
+	signal moveX		: std_logic :='0';
+	signal moveY		: std_logic :='0';
+	signal tick			: std_logic :='1';
+	
+	signal b0,b1,b2,b3	: std_logic;
+	
+	--Score to seven-segment signals
+	signal i1	: std_logic_vector(3 downto 0) := (others => '1');
+	signal i2	: std_logic_vector(3 downto 0) := (others => '1');
+
+
 
 BEGIN
 
-	main : game --instatiate the game component.
-		port map (ballX,ballY,paddle_L,paddle_R,clk);
+	b2 <= button0;
+	b3 <= button1;
+	b0 <= button2;	--deliberately swapped to position them on left and right
+	b1 <= button3;
 	
+--	i1 <= std_logic_vector(to_unsigned(score1, i1'length));
+--	i2 <= std_logic_vector(to_unsigned(score1, i2'length));
+
+--	seg1(0) <= not ((not i1(0) and i1(2)) or (not i1(1) and not i1(3)) or ( not i1(0) and i1(1) and i1(3)) or ( i1(0) and i1(1) and i1(2)) or 
+--				(i1(0) and i1(1) and not i1(3)) or (i1(0) and not i1(1) and not i1(2)) or (i1(0) and not i1(1) and not i1(2) and i1(3)));
+--				
+--	seg1(1) <= not ((not i1(0) and not i1(1)) or (not i1(0) and not i1(2) and not i1(3)) or (not i1(0) and i1(2) and i1(3)) or
+--				(i1(0) and not i1(2) and i1(3)) or (i1(0) and not i1(1) and not i1(3)));
+--				
+--	seg1(2) <= not ((not i1(0) and not i1(2)) or (not i1(0) and i1(1)) or (not i1(0) and i1(2) and i1(3)) or (i1(0) and not i1(1)) or 
+--				(i1(0) and not i1(2) and i1(3)));
+--	
+--	seg1(3) <= not ((not i1(0) and not i1(1) and not i1(3)) or (not i1(1) and i1(2) and i1(3)) or (i1(1) and i1(2) and not i1(3)) or 
+--				(i1(1) and not i1(2) and i1(3)) or (i1(0) and not i1(2)));
+--			
+--	seg1(4) <= not ((i1(0) and i1(1)) or (i1(0) and i1(2)) or (i1(2) and not i1(3)) or (not i1(1) and not i1(3)));
+--	
+--	seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or 
+--				(not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
+--			
+--	seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or
+--				(i1(0) and i1(1) and not i1(2) and not i1(3)));
+--				
+----
+--	seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or 
+--				(i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
+--				
+--	seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or
+--				(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
+--				
+--	seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or 
+--				(i2(0) and not i2(2) and i2(3)));
+--	
+--	seg2(3) <= not ((not i2(0) and not i2(1) and not i2(3)) or (not i2(1) and i2(2) and i2(3)) or (i2(1) and i2(2) and not i2(3)) or 
+--				(i2(1) and not i2(2) and i2(3)) or (i2(0) and not i2(2)));
+--			
+--	seg2(4) <= not ((i2(0) and i2(1)) or (i2(0) and i2(2)) or (i2(2) and not i2(3)) or (not i2(1) and not i2(3)));
+--	
+--	seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or 
+--				(not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
+--			
+--	seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or
+--				(i2(0) and i2(1) and not i2(2) and not i2(3)));
+
+	tickRate:process(clk)
+		BEGIN
+			if(clk'event AND clk = '1') then
+				if(delay = clk_period*5*1000) then
+					delay <= 0;
+					tick	<= NOT tick;
+				else
+					delay <= delay + 1;
+				END if;
+			END if;
+		END process; --tickRate
+
+	mechanics:process(ballx, bally, movex, movey, reset, ball_reset, tick, score1, score2, paddle_L, paddle_R)
+	BEGIN
 	
-	PROCESS(disp_ena, row, column, clk)
+
+		
+--	--Win condition logic
+--		if(score1 = max_score) then
+--		--player 1 wins
+--		
+--		elsif(score2 = max_score) then
+--		--player 2 wins
+--		
+--		END if; --then continue play normally
+
+		if(tick'event AND tick = '1') then
+	--Movement Logic
+			if(moveX = '1') then
+				ballx <= ballx + 1;
+			else
+				ballx <= ballx - 1;
+			END if;
+			if(moveY = '1') then
+				bally <= bally + 1;
+			else
+				bally <= bally - 1;
+			END if;
+			if(b0 = '1' AND b1 = '0' AND paddle_L + paddle_height <= v_pixels) then
+				paddle_L <= paddle_L + 1;
+			elsif(b0 = '0' AND b1 = '1' AND paddle_L >= 0 ) then
+				paddle_L <= paddle_L - 1;
+			END if;
+			if(b2 = '1' AND b3 = '0' AND paddle_R + paddle_height <= v_pixels) then
+				paddle_R <= paddle_R + 1;
+			elsif(b2 = '0' AND b3 = '1' AND paddle_R >= 0) then
+				paddle_R <= paddle_R - 1;
+			END if;
+				
+			
+	--Score Logic
+			if(ballx <= 0) then 
+			--player 2 scores
+				score2 <= score2 + 1;
+				i2 <= std_logic_vector( unsigned(i2) + 1 );
+				ball_reset <= '1';
+			elsif(ballx >= h_pixels) then 
+			--player 1 scores
+				score1 <= score1 + 1;
+				ball_reset <= '1';
+			END if; --ball is in play
+			
+	--reset logic, trigger on game start and at the end of win seqeunce.
+			if(reset = '1') then
+			--reset the game state
+				ball_reset <= '1';
+				score1 <= 0;
+				score2 <= 0;
+				reset <= '0';
+			End if;
+			if(ball_reset = '1') then
+			--the ball has scored, and should be moved to the starting location
+				ballx <= h_pixels/2;
+				bally <= v_pixels/2;
+				ball_reset <= '0';
+				--i1 <= std_logic_vector(to_unsigned(score1, i1'length));
+				--i2 <= std_logic_vector(to_unsigned(score1, i2'length));
+				seg1(0) <= not ((not i1(0) and i1(2)) or (not i1(1) and not i1(3)) or ( not i1(0) and i1(1) and i1(3)) or ( i1(0) and i1(1) and i1(2)) or 
+						(i1(0) and i1(1) and not i1(3)) or (i1(0) and not i1(1) and not i1(2)) or (i1(0) and not i1(1) and not i1(2) and i1(3)));
+				
+				seg1(1) <= not ((not i1(0) and not i1(1)) or (not i1(0) and not i1(2) and not i1(3)) or (not i1(0) and i1(2) and i1(3)) or
+							(i1(0) and not i1(2) and i1(3)) or (i1(0) and not i1(1) and not i1(3)));
+							
+				seg1(2) <= not ((not i1(0) and not i1(2)) or (not i1(0) and i1(1)) or (not i1(0) and i1(2) and i1(3)) or (i1(0) and not i1(1)) or 
+							(i1(0) and not i1(2) and i1(3)));
+				
+				seg1(3) <= not ((not i1(0) and not i1(1) and not i1(3)) or (not i1(1) and i1(2) and i1(3)) or (i1(1) and i1(2) and not i1(3)) or 
+							(i1(1) and not i1(2) and i1(3)) or (i1(0) and not i1(2)));
+						
+				seg1(4) <= not ((i1(0) and i1(1)) or (i1(0) and i1(2)) or (i1(2) and not i1(3)) or (not i1(1) and not i1(3)));
+				
+				seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or 
+							(not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
+						
+				seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or
+							(i1(0) and i1(1) and not i1(2) and not i1(3)));
+							
+				seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or 
+							(i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
+							
+				seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or
+							(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
+							
+				seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or 
+							(i2(0) and not i2(2) and i2(3)));
+				
+				seg2(3) <= not ((not i2(0) and not i2(1) and not i2(3)) or (not i2(1) and i2(2) and i2(3)) or (i2(1) and i2(2) and not i2(3)) or 
+							(i2(1) and not i2(2) and i2(3)) or (i2(0) and not i2(2)));
+						
+				seg2(4) <= not ((i2(0) and i2(1)) or (i2(0) and i2(2)) or (i2(2) and not i2(3)) or (not i2(1) and not i2(3)));
+				
+				seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or 
+							(not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
+						
+				seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or
+							(i2(0) and i2(1) and not i2(2) and not i2(3)));
+			End if;
+			
+	--Collision logic
+	
+			if(ballx <= paddle_width AND
+				paddle_L < ballY AND bally + ball_size < paddle_L + paddle_height) then --left paddle hits
+				movex <= '1';
+			elsif(h_pixels - paddle_width < ballx + ball_size AND
+				paddle_R < ballY AND ballY + ball_size < paddle_R + paddle_height) then --right paddle hits
+				movex <= '0';
+			END if;
+			if(bally <= 0) then --see if hitting top or bottom
+				movey <= '1';
+			elsif(bally + ball_size >= v_pixels) then
+				movey <= '0';
+			END if; 
+		END if;
+			
+	END process; --mechanics
+	
+--Rendering Process
+	PROCESS(disp_ena, row, column, ballx, bally, paddle_L, paddle_R)
 	BEGIN
 		IF(disp_ena = '1') THEN		--display time
 		

@@ -24,6 +24,10 @@ entity game is
 END game;
 
 architecture behavior of game is
+	
+--constants
+	constant DEFAULT_PADDLE_HEIGHT : integer := (v_pixels + paddle_height)/2;
+
 --signals
 
 	--Coordingates of the top-left coordinate (read, smallest) of the square ball.
@@ -31,8 +35,8 @@ architecture behavior of game is
 	signal bally : integer := v_pixels/2;
 	
 	--Current vertical coordinates of the tops of the left and right paddles.
-	signal paddle_L : integer := (v_pixels + paddle_height)/2;
-	signal paddle_R : integer := (v_pixels + paddle_height)/2;
+	signal paddle_L : integer := DEFAULT_PADDLE_HEIGHT;
+	signal paddle_R : integer := DEFAULT_PADDLE_HEIGHT;
 	
 	--Counters
 	signal score1	: integer :=0;
@@ -71,11 +75,11 @@ BEGIN
 	BEGIN
 	
 	--Score Logic
-		if(ballx = 0) then 
+		if(ballx = 0 OR ballx < 0) then 
 		--player 2 scores
 			score2 <= score2 + 1;
 			ball_reset <= '1';
-		elsif(ballx = h_pixels) then 
+		elsif(ballx = h_pixels OR ballx > h_pixels) then 
 		--player 1 scores
 			score1 <= score1 + 1;
 			ball_reset <= '1';
@@ -96,8 +100,8 @@ BEGIN
 			ball_reset <= '1';
 			score1 <= 0;
 			score2 <= 0;
-			paddle_L <= (v_pixels + paddle_height)/2;
-			paddle_R <= (v_pixels + paddle_height)/2;
+			paddle_L <= 400;
+			paddle_R <= 400;
 			reset <= '0';
 		End if;
 		if(ball_reset = '1') then

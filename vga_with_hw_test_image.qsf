@@ -83,14 +83,30 @@ set_location_assignment PIN_C10 -to n_sync
 set_location_assignment PIN_A12 -to pixel_clk
 set_location_assignment PIN_C13 -to v_sync
 set_location_assignment PIN_Y2 -to clk
+set_global_assignment -name PROJECT_IP_REGENERATION_POLICY ALWAYS_REGENERATE_IP
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name SDC_FILE vga_with_hw_test_image.out.sdc
 set_global_assignment -name BDF_FILE vga_with_hw_test_image.bdf
 set_global_assignment -name VHDL_FILE vga_controller.vhd
 set_global_assignment -name VHDL_FILE hw_image_generator.vhd
-set_global_assignment -name QIP_FILE vga_pll.qip
 set_global_assignment -name QIP_FILE altpll0.qip
-set_global_assignment -name VHDL_FILE game.vhd
-set_global_assignment -name PROJECT_IP_REGENERATION_POLICY ALWAYS_REGENERATE_IP
-set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
-set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_location_assignment PIN_M23 -to b0
+set_location_assignment PIN_M21 -to b1
+set_location_assignment PIN_N21 -to b2
+set_location_assignment PIN_R24 -to b3
+set_location_assignment PIN_G18 -to seg1[0]
+set_location_assignment PIN_F22 -to seg1[1]
+set_location_assignment PIN_E17 -to seg1[2]
+set_location_assignment PIN_L26 -to seg1[3]
+set_location_assignment PIN_L25 -to seg1[4]
+set_location_assignment PIN_J22 -to seg1[5]
+set_location_assignment PIN_H22 -to seg1[6]
+set_location_assignment PIN_M24 -to seg2[0]
+set_location_assignment PIN_Y22 -to seg2[1]
+set_location_assignment PIN_W21 -to seg2[2]
+set_location_assignment PIN_W22 -to seg2[3]
+set_location_assignment PIN_W25 -to seg2[4]
+set_location_assignment PIN_U23 -to seg2[5]
+set_location_assignment PIN_U24 -to seg2[6]
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

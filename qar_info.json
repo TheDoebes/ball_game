@@ -1,6 +1,6 @@
 {
-	"common_dir" : "C:/altera/playground2/cyclone/vga_with_hw_test_image/",
-	"acds_version" : "Version 17.0.0",
+	"common_dir" : "M:/intelFPGA_lite/16.1/digikey_vga/ball_game/",
+	"acds_version" : "Version 16.1.0",
 	"platform" : "windows",
 	"os" : "Windows 10",
 	"qpf" : "vga_with_hw_test_image.qpf"
