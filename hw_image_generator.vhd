@@ -84,8 +84,8 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	signal b0,b1,b2,b3	: std_logic;
 	
 	--Score to seven-segment signals
-	signal i1	: std_logic_vector(3 downto 0) := (others => '0');
-	signal i2	: std_logic_vector(3 downto 0) := (others => '0');
+	signal i1	: std_logic_vector(0 to 3) := (others => '0');
+	signal i2	: std_logic_vector(0 to 3) := (others => '0');
 
 
 
@@ -152,26 +152,7 @@ BEGIN
 			--player 2 scores
 --				score2 <= score2 + 1;
 				i2 <= std_logic_vector( unsigned(i2) + 1 );
-				ball_reset <= '1';
-			elsif(ballx >= h_pixels) then 
-			--player 1 scores
---				score1 <= score1 + 1;
-				i1 <= std_logic_vector( unsigned(i1) + 1 );
-				ball_reset <= '1';
-			END if; --ball is in play
-			
-	--reset logic, trigger on game start and at the end of win seqeunce.
-			if(reset = '1') then
-			--reset the game state
-				ball_reset <= '1';
---				score1 <= 0;
---				score2 <= 0;
-				i1 <= (others => '0');
-				i2 <= (others => '0');
-				reset <= '0';
-			End if;
-			if(ball_reset = '1') then
-			--the ball has scored, and should be moved to the starting location
+--				ball_reset <= '1';
 				ballx <= h_pixels/2;
 				bally <= v_pixels/2;
 				ball_reset <= '0';
@@ -192,7 +173,89 @@ BEGIN
 				seg2(4) <= not ((i2(0) and i2(1)) or (i2(0) and i2(2)) or (i2(2) and not i2(3)) or (not i2(1) and not i2(3)));
 				seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or (not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
 				seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or(i2(0) and i2(1) and not i2(2) and not i2(3)));
+			
+			elsif(ballx >= h_pixels) then 
+			--player 1 scores
+--				score1 <= score1 + 1;
+				i1 <= std_logic_vector( unsigned(i1) + 1 );
+--				ball_reset <= '1';
+				ballx <= h_pixels/2;
+				bally <= v_pixels/2;
+				ball_reset <= '0';
+				--i1 <= std_logic_vector(to_unsigned(score1, i1'length));
+				--i2 <= std_logic_vector(to_unsigned(score1, i2'length));
+				seg1(0) <= not ((not i1(0) and i1(2)) or (not i1(1) and not i1(3)) or ( not i1(0) and i1(1) and i1(3)) or ( i1(0) and i1(1) and i1(2)) or (i1(0) and i1(1) and not i1(3)) or (i1(0) and not i1(1) and not i1(2)) or (i1(0) and not i1(1) and not i1(2) and i1(3)));
+				seg1(1) <= not ((not i1(0) and not i1(1)) or (not i1(0) and not i1(2) and not i1(3)) or (not i1(0) and i1(2) and i1(3)) or(i1(0) and not i1(2) and i1(3)) or (i1(0) and not i1(1) and not i1(3)));
+				seg1(2) <= not ((not i1(0) and not i1(2)) or (not i1(0) and i1(1)) or (not i1(0) and i1(2) and i1(3)) or (i1(0) and not i1(1)) or (i1(0) and not i1(2) and i1(3)));
+				seg1(3) <= not ((not i1(0) and not i1(1) and not i1(3)) or (not i1(1) and i1(2) and i1(3)) or (i1(1) and i1(2) and not i1(3)) or (i1(1) and not i1(2) and i1(3)) or (i1(0) and not i1(2)));
+				seg1(4) <= not ((i1(0) and i1(1)) or (i1(0) and i1(2)) or (i1(2) and not i1(3)) or (not i1(1) and not i1(3)));
+				seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or (not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
+				seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or(i1(0) and i1(1) and not i1(2) and not i1(3)));
+				
+				seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or (i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
+				seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
+				seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or (i2(0) and not i2(2) and i2(3)));
+				seg2(3) <= not ((not i2(0) and not i2(1) and not i2(3)) or (not i2(1) and i2(2) and i2(3)) or (i2(1) and i2(2) and not i2(3)) or (i2(1) and not i2(2) and i2(3)) or (i2(0) and not i2(2)));
+				seg2(4) <= not ((i2(0) and i2(1)) or (i2(0) and i2(2)) or (i2(2) and not i2(3)) or (not i2(1) and not i2(3)));
+				seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or (not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
+				seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or(i2(0) and i2(1) and not i2(2) and not i2(3)));
+			
+			END if; --ball is in play
+			
+	--reset logic, trigger on game start and at the end of win seqeunce.
+			if(reset = '1') then
+			--reset the game state
+--				ball_reset <= '1';
+				ballx <= h_pixels/2;
+				bally <= v_pixels/2;
+				ball_reset <= '0';
+				--i1 <= std_logic_vector(to_unsigned(score1, i1'length));
+				--i2 <= std_logic_vector(to_unsigned(score1, i2'length));
+				seg1(0) <= not ((not i1(0) and i1(2)) or (not i1(1) and not i1(3)) or ( not i1(0) and i1(1) and i1(3)) or ( i1(0) and i1(1) and i1(2)) or (i1(0) and i1(1) and not i1(3)) or (i1(0) and not i1(1) and not i1(2)) or (i1(0) and not i1(1) and not i1(2) and i1(3)));
+				seg1(1) <= not ((not i1(0) and not i1(1)) or (not i1(0) and not i1(2) and not i1(3)) or (not i1(0) and i1(2) and i1(3)) or(i1(0) and not i1(2) and i1(3)) or (i1(0) and not i1(1) and not i1(3)));
+				seg1(2) <= not ((not i1(0) and not i1(2)) or (not i1(0) and i1(1)) or (not i1(0) and i1(2) and i1(3)) or (i1(0) and not i1(1)) or (i1(0) and not i1(2) and i1(3)));
+				seg1(3) <= not ((not i1(0) and not i1(1) and not i1(3)) or (not i1(1) and i1(2) and i1(3)) or (i1(1) and i1(2) and not i1(3)) or (i1(1) and not i1(2) and i1(3)) or (i1(0) and not i1(2)));
+				seg1(4) <= not ((i1(0) and i1(1)) or (i1(0) and i1(2)) or (i1(2) and not i1(3)) or (not i1(1) and not i1(3)));
+				seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or (not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
+				seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or(i1(0) and i1(1) and not i1(2) and not i1(3)));
+				
+				seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or (i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
+				seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
+				seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or (i2(0) and not i2(2) and i2(3)));
+				seg2(3) <= not ((not i2(0) and not i2(1) and not i2(3)) or (not i2(1) and i2(2) and i2(3)) or (i2(1) and i2(2) and not i2(3)) or (i2(1) and not i2(2) and i2(3)) or (i2(0) and not i2(2)));
+				seg2(4) <= not ((i2(0) and i2(1)) or (i2(0) and i2(2)) or (i2(2) and not i2(3)) or (not i2(1) and not i2(3)));
+				seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or (not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
+				seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or(i2(0) and i2(1) and not i2(2) and not i2(3)));
+			
+--				score1 <= 0;
+--				score2 <= 0;
+				i1 <= (others => '0');
+				i2 <= (others => '0');
+				reset <= '0';
 			End if;
+--			if(ball_reset = '1') then
+			--the ball has scored, and should be moved to the starting location
+--				ballx <= h_pixels/2;
+--				bally <= v_pixels/2;
+--				ball_reset <= '0';
+--				--i1 <= std_logic_vector(to_unsigned(score1, i1'length));
+--				--i2 <= std_logic_vector(to_unsigned(score1, i2'length));
+--				seg1(0) <= not ((not i1(0) and i1(2)) or (not i1(1) and not i1(3)) or ( not i1(0) and i1(1) and i1(3)) or ( i1(0) and i1(1) and i1(2)) or (i1(0) and i1(1) and not i1(3)) or (i1(0) and not i1(1) and not i1(2)) or (i1(0) and not i1(1) and not i1(2) and i1(3)));
+--				seg1(1) <= not ((not i1(0) and not i1(1)) or (not i1(0) and not i1(2) and not i1(3)) or (not i1(0) and i1(2) and i1(3)) or(i1(0) and not i1(2) and i1(3)) or (i1(0) and not i1(1) and not i1(3)));
+--				seg1(2) <= not ((not i1(0) and not i1(2)) or (not i1(0) and i1(1)) or (not i1(0) and i1(2) and i1(3)) or (i1(0) and not i1(1)) or (i1(0) and not i1(2) and i1(3)));
+--				seg1(3) <= not ((not i1(0) and not i1(1) and not i1(3)) or (not i1(1) and i1(2) and i1(3)) or (i1(1) and i1(2) and not i1(3)) or (i1(1) and not i1(2) and i1(3)) or (i1(0) and not i1(2)));
+--				seg1(4) <= not ((i1(0) and i1(1)) or (i1(0) and i1(2)) or (i1(2) and not i1(3)) or (not i1(1) and not i1(3)));
+--				seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or (not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
+--				seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or(i1(0) and i1(1) and not i1(2) and not i1(3)));
+--				
+--				seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or (i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
+--				seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
+--				seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or (i2(0) and not i2(2) and i2(3)));
+--				seg2(3) <= not ((not i2(0) and not i2(1) and not i2(3)) or (not i2(1) and i2(2) and i2(3)) or (i2(1) and i2(2) and not i2(3)) or (i2(1) and not i2(2) and i2(3)) or (i2(0) and not i2(2)));
+--				seg2(4) <= not ((i2(0) and i2(1)) or (i2(0) and i2(2)) or (i2(2) and not i2(3)) or (not i2(1) and not i2(3)));
+--				seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or (not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
+--				seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or(i2(0) and i2(1) and not i2(2) and not i2(3)));
+--			End if;
 			
 	--Collision logic
 	
@@ -242,21 +305,26 @@ BEGIN
 				blue <= (OTHERS => '0');
 		
 		--render the black background and white centerline
-			elsif(h_pixels/2 - paddle_width < row AND row < h_pixels/2 + paddle_width)
+			elsif(h_pixels/2 - paddle_width/4 < row AND row < h_pixels/2 + paddle_width/4)
 			then
-				for j in 0 to (v_pixels / ball_size) loop
-			--Dash the centerline
-					if (j*ball_size <= column and column <= j*ball_size + ball_size/2)
-					then
-						red <= "01000000";
-						green <= "01000000";
-						blue <= "01000000";
-					else
-						red <= (OTHERS => '0');
-						green	<= (OTHERS => '0');
-						blue <= (OTHERS => '0');
-					end if;
-				end loop;
+				red <= "10000000";
+				green <= "10000000";
+				blue <= "10000000";
+--	lol jk my loop no work			
+--						
+--				for j in 0 to (v_pixels / ball_size) loop
+--			--Dash the centerline
+--					if (j*ball_size <= column and column <= j*ball_size + ball_size/2)
+--					then
+--						red <= "10000000";
+--						green <= "10000000";
+--						blue <= "10000000";
+----					else
+----						red <= (OTHERS => '0');
+----						green	<= (OTHERS => '0');
+----						blue <= (OTHERS => '0');
+--					end if;
+--				end loop;
 			ELSE 
 				red <= (OTHERS => '0');
 				green	<= (OTHERS => '0');
