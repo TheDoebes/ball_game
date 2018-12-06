@@ -84,8 +84,8 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	signal b0,b1,b2,b3	: std_logic;
 	
 	--Score to seven-segment signals
-	signal i1	: std_logic_vector(3 downto 0) := (others => '1');
-	signal i2	: std_logic_vector(3 downto 0) := (others => '1');
+	signal i1	: std_logic_vector(3 downto 0) := (others => '0');
+	signal i2	: std_logic_vector(3 downto 0) := (others => '0');
 
 
 
@@ -96,49 +96,6 @@ BEGIN
 	b0 <= button2;	--deliberately swapped to position them on left and right
 	b1 <= button3;
 	
---	i1 <= std_logic_vector(to_unsigned(score1, i1'length));
---	i2 <= std_logic_vector(to_unsigned(score1, i2'length));
-
---	seg1(0) <= not ((not i1(0) and i1(2)) or (not i1(1) and not i1(3)) or ( not i1(0) and i1(1) and i1(3)) or ( i1(0) and i1(1) and i1(2)) or 
---				(i1(0) and i1(1) and not i1(3)) or (i1(0) and not i1(1) and not i1(2)) or (i1(0) and not i1(1) and not i1(2) and i1(3)));
---				
---	seg1(1) <= not ((not i1(0) and not i1(1)) or (not i1(0) and not i1(2) and not i1(3)) or (not i1(0) and i1(2) and i1(3)) or
---				(i1(0) and not i1(2) and i1(3)) or (i1(0) and not i1(1) and not i1(3)));
---				
---	seg1(2) <= not ((not i1(0) and not i1(2)) or (not i1(0) and i1(1)) or (not i1(0) and i1(2) and i1(3)) or (i1(0) and not i1(1)) or 
---				(i1(0) and not i1(2) and i1(3)));
---	
---	seg1(3) <= not ((not i1(0) and not i1(1) and not i1(3)) or (not i1(1) and i1(2) and i1(3)) or (i1(1) and i1(2) and not i1(3)) or 
---				(i1(1) and not i1(2) and i1(3)) or (i1(0) and not i1(2)));
---			
---	seg1(4) <= not ((i1(0) and i1(1)) or (i1(0) and i1(2)) or (i1(2) and not i1(3)) or (not i1(1) and not i1(3)));
---	
---	seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or 
---				(not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
---			
---	seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or
---				(i1(0) and i1(1) and not i1(2) and not i1(3)));
---				
-----
---	seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or 
---				(i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
---				
---	seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or
---				(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
---				
---	seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or 
---				(i2(0) and not i2(2) and i2(3)));
---	
---	seg2(3) <= not ((not i2(0) and not i2(1) and not i2(3)) or (not i2(1) and i2(2) and i2(3)) or (i2(1) and i2(2) and not i2(3)) or 
---				(i2(1) and not i2(2) and i2(3)) or (i2(0) and not i2(2)));
---			
---	seg2(4) <= not ((i2(0) and i2(1)) or (i2(0) and i2(2)) or (i2(2) and not i2(3)) or (not i2(1) and not i2(3)));
---	
---	seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or 
---				(not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
---			
---	seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or
---				(i2(0) and i2(1) and not i2(2) and not i2(3)));
 
 	tickRate:process(clk)
 		BEGIN
@@ -199,6 +156,7 @@ BEGIN
 			elsif(ballx >= h_pixels) then 
 			--player 1 scores
 				score1 <= score1 + 1;
+				i1 <= std_logic_vector( unsigned(i1) + 1 );
 				ball_reset <= '1';
 			END if; --ball is in play
 			
@@ -208,6 +166,8 @@ BEGIN
 				ball_reset <= '1';
 				score1 <= 0;
 				score2 <= 0;
+				i1 <= (others => '0');
+				i2 <= (others => '0');
 				reset <= '0';
 			End if;
 			if(ball_reset = '1') then
@@ -217,45 +177,20 @@ BEGIN
 				ball_reset <= '0';
 				--i1 <= std_logic_vector(to_unsigned(score1, i1'length));
 				--i2 <= std_logic_vector(to_unsigned(score1, i2'length));
-				seg1(0) <= not ((not i1(0) and i1(2)) or (not i1(1) and not i1(3)) or ( not i1(0) and i1(1) and i1(3)) or ( i1(0) and i1(1) and i1(2)) or 
-						(i1(0) and i1(1) and not i1(3)) or (i1(0) and not i1(1) and not i1(2)) or (i1(0) and not i1(1) and not i1(2) and i1(3)));
-				
-				seg1(1) <= not ((not i1(0) and not i1(1)) or (not i1(0) and not i1(2) and not i1(3)) or (not i1(0) and i1(2) and i1(3)) or
-							(i1(0) and not i1(2) and i1(3)) or (i1(0) and not i1(1) and not i1(3)));
-							
-				seg1(2) <= not ((not i1(0) and not i1(2)) or (not i1(0) and i1(1)) or (not i1(0) and i1(2) and i1(3)) or (i1(0) and not i1(1)) or 
-							(i1(0) and not i1(2) and i1(3)));
-				
-				seg1(3) <= not ((not i1(0) and not i1(1) and not i1(3)) or (not i1(1) and i1(2) and i1(3)) or (i1(1) and i1(2) and not i1(3)) or 
-							(i1(1) and not i1(2) and i1(3)) or (i1(0) and not i1(2)));
-						
+				seg1(0) <= not ((not i1(0) and i1(2)) or (not i1(1) and not i1(3)) or ( not i1(0) and i1(1) and i1(3)) or ( i1(0) and i1(1) and i1(2)) or (i1(0) and i1(1) and not i1(3)) or (i1(0) and not i1(1) and not i1(2)) or (i1(0) and not i1(1) and not i1(2) and i1(3)));
+				seg1(1) <= not ((not i1(0) and not i1(1)) or (not i1(0) and not i1(2) and not i1(3)) or (not i1(0) and i1(2) and i1(3)) or(i1(0) and not i1(2) and i1(3)) or (i1(0) and not i1(1) and not i1(3)));
+				seg1(2) <= not ((not i1(0) and not i1(2)) or (not i1(0) and i1(1)) or (not i1(0) and i1(2) and i1(3)) or (i1(0) and not i1(1)) or (i1(0) and not i1(2) and i1(3)));
+				seg1(3) <= not ((not i1(0) and not i1(1) and not i1(3)) or (not i1(1) and i1(2) and i1(3)) or (i1(1) and i1(2) and not i1(3)) or (i1(1) and not i1(2) and i1(3)) or (i1(0) and not i1(2)));
 				seg1(4) <= not ((i1(0) and i1(1)) or (i1(0) and i1(2)) or (i1(2) and not i1(3)) or (not i1(1) and not i1(3)));
-				
-				seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or 
-							(not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
-						
-				seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or
-							(i1(0) and i1(1) and not i1(2) and not i1(3)));
-							
-				seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or 
-							(i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
-							
-				seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or
-							(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
-							
-				seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or 
-							(i2(0) and not i2(2) and i2(3)));
-				
-				seg2(3) <= not ((not i2(0) and not i2(1) and not i2(3)) or (not i2(1) and i2(2) and i2(3)) or (i2(1) and i2(2) and not i2(3)) or 
-							(i2(1) and not i2(2) and i2(3)) or (i2(0) and not i2(2)));
-						
+				seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or (not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
+				seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or(i1(0) and i1(1) and not i1(2) and not i1(3)));
+				seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or (i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
+				seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
+				seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or (i2(0) and not i2(2) and i2(3)));
+				seg2(3) <= not ((not i2(0) and not i2(1) and not i2(3)) or (not i2(1) and i2(2) and i2(3)) or (i2(1) and i2(2) and not i2(3)) or (i2(1) and not i2(2) and i2(3)) or (i2(0) and not i2(2)));
 				seg2(4) <= not ((i2(0) and i2(1)) or (i2(0) and i2(2)) or (i2(2) and not i2(3)) or (not i2(1) and not i2(3)));
-				
-				seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or 
-							(not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
-						
-				seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or
-							(i2(0) and i2(1) and not i2(2) and not i2(3)));
+				seg2(5) <= not ((not i2(0) and i2(1) and not i2(2)) or (not i2(0) and i2(1) and not i2(3)) or (not i2(2) and not i2(3)) or (i2(0) and not i2(1)) or (i2(0) and i2(1) and i2(2)));
+				seg2(6) <= ((not i2(0) and not i2(1) and not i2(2)) or (not i2(0) and i2(1) and i2(2) and i2(3)) or(i2(0) and i2(1) and not i2(2) and not i2(3)));
 			End if;
 			
 	--Collision logic
