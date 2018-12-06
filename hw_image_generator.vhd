@@ -57,7 +57,7 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	constant	ball_size		: integer := 20;
 	constant h_pixels			: integer := 800;
 	constant v_pixels			: integer := 600;
-	constant max_score		: integer := 9;
+--	constant max_score		: integer := 9;
 	constant clk_period		: integer := 20;
 
 	--Coordingates of the top-left coordinate (read, smallest) of the square ball.
@@ -69,8 +69,8 @@ ARCHITECTURE behavior OF hw_image_generator IS
 	signal paddle_R : integer := v_pixels/2 - paddle_height/2;
 	
 	--Counters
-	signal score1	: integer :=0;
-	signal score2	: integer :=0;
+--	signal score1	: integer :=0;
+--	signal score2	: integer :=0;
 	
 	signal delay	: integer :=0;
 	
@@ -109,7 +109,7 @@ BEGIN
 			END if;
 		END process; --tickRate
 
-	mechanics:process(ballx, bally, movex, movey, reset, ball_reset, tick, score1, score2, paddle_L, paddle_R)
+	mechanics:process(ballx, bally, movex, movey, reset, ball_reset, tick, paddle_L, paddle_R)--score1, score2, 
 	BEGIN
 	
 
@@ -150,12 +150,12 @@ BEGIN
 	--Score Logic
 			if(ballx <= 0) then 
 			--player 2 scores
-				score2 <= score2 + 1;
+--				score2 <= score2 + 1;
 				i2 <= std_logic_vector( unsigned(i2) + 1 );
 				ball_reset <= '1';
 			elsif(ballx >= h_pixels) then 
 			--player 1 scores
-				score1 <= score1 + 1;
+--				score1 <= score1 + 1;
 				i1 <= std_logic_vector( unsigned(i1) + 1 );
 				ball_reset <= '1';
 			END if; --ball is in play
@@ -164,8 +164,8 @@ BEGIN
 			if(reset = '1') then
 			--reset the game state
 				ball_reset <= '1';
-				score1 <= 0;
-				score2 <= 0;
+--				score1 <= 0;
+--				score2 <= 0;
 				i1 <= (others => '0');
 				i2 <= (others => '0');
 				reset <= '0';
@@ -184,6 +184,7 @@ BEGIN
 				seg1(4) <= not ((i1(0) and i1(1)) or (i1(0) and i1(2)) or (i1(2) and not i1(3)) or (not i1(1) and not i1(3)));
 				seg1(5) <= not ((not i1(0) and i1(1) and not i1(2)) or (not i1(0) and i1(1) and not i1(3)) or (not i1(2) and not i1(3)) or (i1(0) and not i1(1)) or (i1(0) and i1(1) and i1(2)));
 				seg1(6) <= ((not i1(0) and not i1(1) and not i1(2)) or (not i1(0) and i1(1) and i1(2) and i1(3)) or(i1(0) and i1(1) and not i1(2) and not i1(3)));
+				
 				seg2(0) <= not ((not i2(0) and i2(2)) or (not i2(1) and not i2(3)) or ( not i2(0) and i2(1) and i2(3)) or ( i2(0) and i2(1) and i2(2)) or (i2(0) and i2(1) and not i2(3)) or (i2(0) and not i2(1) and not i2(2)) or (i2(0) and not i2(1) and not i2(2) and i2(3)));
 				seg2(1) <= not ((not i2(0) and not i2(1)) or (not i2(0) and not i2(2) and not i2(3)) or (not i2(0) and i2(2) and i2(3)) or(i2(0) and not i2(2) and i2(3)) or (i2(0) and not i2(1) and not i2(3)));
 				seg2(2) <= not ((not i2(0) and not i2(2)) or (not i2(0) and i2(1)) or (not i2(0) and i2(2) and i2(3)) or (i2(0) and not i2(1)) or (i2(0) and not i2(2) and i2(3)));
