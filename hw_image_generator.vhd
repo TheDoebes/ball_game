@@ -242,12 +242,20 @@ BEGIN
 				blue <= (OTHERS => '0');
 		
 		--render the black background and white centerline
-			elsif(h_pixels/2 - paddle_width < row AND row < h_pixels/2 + paddle_width)-- AND
-			
+			elsif(h_pixels/2 - paddle_width < row AND row < h_pixels/2 + paddle_width)
 			then
-				red <= "01000000";
-				green <= "01000000";
-				blue <= "01000000";
+				for j in 0 to (v_pixels / ball_size) loop
+					if (j*ball_size <= column and column <= j*ball_size + ball_size/2)
+					then
+						red <= "01000000";
+						green <= "01000000";
+						blue <= "01000000";
+					else
+						red <= (OTHERS => '0');
+						green	<= (OTHERS => '0');
+						blue <= (OTHERS => '0');
+					end if;
+				end loop;
 			ELSE 
 				red <= (OTHERS => '0');
 				green	<= (OTHERS => '0');
