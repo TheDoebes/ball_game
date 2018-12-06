@@ -219,12 +219,12 @@ BEGIN
 		
 	--render the game elements
 	
-		--render the purple ball
+		--render the white ball
 			if(ballx < row AND row < ballx + ball_size AND 
 				bally < column AND column < bally + ball_size)
 			then 
 				red <= (others => '1');
-				green	<= (OTHERS => '0');
+				green	<= (OTHERS => '1');
 				blue <= (OTHERS => '1');
 		--render the left blue paddle
 			elsif(row < paddle_width AND 
@@ -241,11 +241,17 @@ BEGIN
 				green	<= (OTHERS => '0');
 				blue <= (OTHERS => '0');
 		
-		--render the teal background
+		--render the black background and white centerline
+			elsif(h_pixels/2 - paddle_width < row AND row < h_pixels/2 + paddle_width)-- AND
+			
+			then
+				red <= "01000000";
+				green <= "01000000";
+				blue <= "01000000";
 			ELSE 
 				red <= (OTHERS => '0');
-				green	<= (OTHERS => '1');
-				blue <= (OTHERS => '1');
+				green	<= (OTHERS => '0');
+				blue <= (OTHERS => '0');
 			END IF;
 			
 			
