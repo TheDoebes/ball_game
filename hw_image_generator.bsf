@@ -21,9 +21,9 @@ agreement for further details.
 */
 (header "symbol" (version "1.1"))
 (symbol
-	(rect 16 16 208 128)
+	(rect 16 16 208 192)
 	(text "hw_image_generator" (rect 5 0 88 12)(font "Arial" ))
-	(text "inst" (rect 8 96 20 108)(font "Arial" ))
+	(text "inst" (rect 8 160 20 172)(font "Arial" ))
 	(port
 		(pt 0 32)
 		(input)
@@ -53,6 +53,34 @@ agreement for further details.
 		(line (pt 0 80)(pt 16 80)(line_width 3))
 	)
 	(port
+		(pt 0 96)
+		(input)
+		(text "button0" (rect 0 0 28 12)(font "Arial" ))
+		(text "button0" (rect 21 91 49 103)(font "Arial" ))
+		(line (pt 0 96)(pt 16 96)(line_width 1))
+	)
+	(port
+		(pt 0 112)
+		(input)
+		(text "button1" (rect 0 0 27 12)(font "Arial" ))
+		(text "button1" (rect 21 107 48 119)(font "Arial" ))
+		(line (pt 0 112)(pt 16 112)(line_width 1))
+	)
+	(port
+		(pt 0 128)
+		(input)
+		(text "button2" (rect 0 0 28 12)(font "Arial" ))
+		(text "button2" (rect 21 123 49 135)(font "Arial" ))
+		(line (pt 0 128)(pt 16 128)(line_width 1))
+	)
+	(port
+		(pt 0 144)
+		(input)
+		(text "button3" (rect 0 0 28 12)(font "Arial" ))
+		(text "button3" (rect 21 139 49 151)(font "Arial" ))
+		(line (pt 0 144)(pt 16 144)(line_width 1))
+	)
+	(port
 		(pt 192 32)
 		(output)
 		(text "red[7..0]" (rect 0 0 33 12)(font "Arial" ))
@@ -73,18 +101,32 @@ agreement for further details.
 		(text "blue[7..0]" (rect 136 59 171 71)(font "Arial" ))
 		(line (pt 192 64)(pt 176 64)(line_width 3))
 	)
+	(port
+		(pt 192 80)
+		(output)
+		(text "seg1[6..0]" (rect 0 0 37 12)(font "Arial" ))
+		(text "seg1[6..0]" (rect 134 75 171 87)(font "Arial" ))
+		(line (pt 192 80)(pt 176 80)(line_width 3))
+	)
+	(port
+		(pt 192 96)
+		(output)
+		(text "seg2[6..0]" (rect 0 0 38 12)(font "Arial" ))
+		(text "seg2[6..0]" (rect 133 91 171 103)(font "Arial" ))
+		(line (pt 192 96)(pt 176 96)(line_width 3))
+	)
 	(parameter
 		"pixels_y"
-		"478"
+		"60"
 		""
 		(type "PARAMETER_SIGNED_DEC")	)
 	(parameter
 		"pixels_x"
-		"600"
+		"40"
 		""
 		(type "PARAMETER_SIGNED_DEC")	)
 	(drawing
-		(rectangle (rect 16 16 176 96)(line_width 1))
+		(rectangle (rect 16 16 176 160)(line_width 1))
 	)
 	(annotation_block (parameter)(rect 208 -64 308 16))
 )
