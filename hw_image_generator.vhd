@@ -245,6 +245,7 @@ BEGIN
 			elsif(h_pixels/2 - paddle_width < row AND row < h_pixels/2 + paddle_width)
 			then
 				for j in 0 to (v_pixels / ball_size) loop
+			--Dash the centerline
 					if (j*ball_size <= column and column <= j*ball_size + ball_size/2)
 					then
 						red <= "01000000";
